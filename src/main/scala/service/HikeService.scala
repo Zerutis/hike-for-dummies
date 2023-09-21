@@ -3,10 +3,11 @@ package service
 
 import repo.HikeRepo
 
-import zio.{ZIO, ZLayer}
+import model.Hike
+import zio.{Task, ZIO, ZLayer}
 
 case class HikeService(hikeRepo: HikeRepo) {
-  def getHike(id: Int) = hikeRepo.findById(id)
+  def listHikes(): Task[List[Hike]] = hikeRepo.findAll()
 }
 
 object HikeService {

@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: dummies-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: dummies
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+#      - data:/var/lib/postgresql/data
+#
+#  pg-admin:
+#    image: dpage/pgadmin4:6
+#    container_name: dummies-pgadmin
+#    environment:
+#      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+#      - PGADMIN_DEFAULT_PASSWORD=admin
+#      - PGADMIN_LISTEN_PORT=5050
+#    ports:
+#      - "5050:5050"
+#
+#volumes:
+#  data:
