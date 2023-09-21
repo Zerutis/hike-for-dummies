@@ -1,13 +1,12 @@
 package dummies
 
-import zio._
-import zio.http._
-import controller.HikeController
-import repo.HikeRepo
-import service.HikeService
-
 import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
+import zio._
+import zio.http._
+
+import controller.HikeController
+import repo.HikeRepo
 
 object Main extends ZIOAppDefault {
 
@@ -15,7 +14,7 @@ object Main extends ZIOAppDefault {
   lazy val dataSourceLayer = Quill.DataSource.fromPrefix("ctx")
 
   lazy val databaseLayer = dataSourceLayer >>> postgresLayer
-  lazy val hikeLayer =  databaseLayer >>>  HikeRepo.layer >>> HikeService.layer
+  lazy val hikeLayer =  databaseLayer >>>  HikeRepo.layer
 
   lazy val apps = HikeController.app
   lazy val httpApps = apps.provideLayer(hikeLayer).withDefaultErrorResponse
