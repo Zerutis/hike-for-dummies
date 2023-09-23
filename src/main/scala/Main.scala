@@ -27,7 +27,9 @@ object Main extends ZIOAppDefault {
   lazy val hikeLayer =  databaseLayer >>>  HikeRepo.layer
 
   lazy val apps = HikeController.app @@ cors(corsConfig)
-  lazy val httpApps = apps.provideLayer(hikeLayer).withDefaultErrorResponse
+  lazy val httpApps = apps
+    .provideLayer(hikeLayer)
+    .mapError(e => Response.text(e.getMessage))
 
   override def run = for {
     _ <- Console.printLine(s"Starting server at http://localhost:8080")
