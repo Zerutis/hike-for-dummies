@@ -2,17 +2,13 @@ package dummies
 
 import model.Hike
 
-import zio.http.html.{Dom, _}
+import zio.http.html._
 
 package object View {
+
   private val pageConfig: Html = html(
     langAttr := "en",
     head(
-      meta(charsetAttr := "utf-8"),
-      meta(nameAttr := "viewport", contentAttr := "width=device-width, initial-scale=1, shrink-to-fit=no"),
-      meta(nameAttr := "description", contentAttr := ""),
-      meta(nameAttr := "author", contentAttr := ""),
-      link(relAttr := "icon", hrefAttr := "favicon.ico"),
       title("Hikes for dummies"),
       link(
         relAttr := "stylesheet",
@@ -20,170 +16,130 @@ package object View {
       ),
       script(srcAttr := "https://code.jquery.com/jquery-3.5.1.slim.min.js"),
       script(srcAttr := "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"),
+      script(
+        srcAttr := "https://unpkg.com/htmx.org@1.9.6",
+        Dom.attr("integrity", "sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"),
+        Dom.attr("crossorigin", "anonymous"),
+        ),
+      script(srcAttr := "https://unpkg.com/htmx.org/dist/ext/json-enc.js"),
     ),
   )
 
-  def index(hikes: List[Hike]): Html = pageConfig ++ Html.fromDomElement(
-    Dom.element(
-      "body",
-      Dom.element(
-        "h1",
-        Dom.attr("class", "text-center"),
-        Dom.text("Hikes for dummies using MVC")
-        ),
-      Dom.element(
-        "table",
-        Dom.attr("class", "table table-striped table-bordered table-hover"),
-        Dom.element(
-          "thead",
-          Dom.element(
-            "tr",
-            Dom.element("th", Dom.text("Name")),
-            Dom.element("th", Dom.text("Distance")),
-            Dom.element("th", Dom.text("Elevation")),
-            Dom.element("th", Dom.text("Difficulty")),
-            Dom.element("th", Dom.text("Description")),
-            Dom.element("th", Dom.text("Actions")),
-            )
-          ),
-        Dom.element(
-          "tbody",
+  private val titleContent = body(h1("Hikes for dummies using MVC", classAttr := List("text-center")))
+
+
+  def index(hikes: Seq[Hike]): Html = {
+    pageConfig ++ titleContent ++ tableContent(hikes) ++ formContent
+  }
+
+  private def tableContent(hikes: Seq[Hike]): Html =
+    div(
+      idAttr := "table",
+      table(
+        classAttr := List("table table-striped table-bordered"),
+        tHead(tr(th("Name"), th("Distance"), th("Elevation"), th("Difficulty"), th("Description"), th("Actions"))),
+        tBody(
+          idAttr := "hikes-table",
+          Dom.attr("hx-get", "/mvc/hikes"),
+          Dom.attr("hx-target", "closest tr"),
+          Dom.attr("hx-swap", "outerHTML"),
           hikes.map(
             hike =>
-              Dom.element(
-                "tr",
-                Dom.element("td", Dom.text(hike.name)),
-                Dom.element("td", Dom.text(hike.distance.toString)),
-                Dom.element("td", Dom.text(hike.elevation.toString)),
-                Dom.element("td", Dom.text(hike.difficulty)),
-                Dom.element("td", Dom.text(hike.description)),
-                Dom.element(
-                  "td",
-                  Dom.element(
-                    "button",
-                    Dom.text("Edit"),
-                    Dom.attr("type", "submit"),
-                    Dom.attr("class", "btn btn-success"),
-                    ),
-                  Dom.element(
-                    "a",
-                    Dom.text("Delete"),
-                    Dom.attr("role", "button"),
-                    Dom.attr("class", "btn btn-danger"),
-                    Dom.attr("href", s"/mvc/hikes/${hike.id}"),
-                  )
-                ),
-              )
-            ): _*
-          )
-        ),
-      Dom.element(
-        "div",
-        Dom.attr("class", "container p-10 my-10 border border-primary rounded"),
-        Dom.attr("style", "width: 50%; margin: 0 auto; margin-top: 20px; margin-bottom: 20px; padding: 20px;"),
-        Dom.element("h2", Dom.text("Add a new hike")),
-        Dom.element(
-          "form",
-          Dom.attr("action", "/mvc/hikes"),
-          Dom.attr("method", "post"),
-          Dom.attr("class", "form-horizontal"),
-          Dom.attr("enctype", "text/plain"),
-          Dom.element(
-            "div",
-            Dom.attr("class", "form-group"),
-            Dom.element(
-              "label",
-              Dom.attr("for", "name"),
-              Dom.text("Name"),
-              ),
-            Dom.element(
-              "input",
-              Dom.attr("type", "text"),
-              Dom.attr("class", "form-control"),
-              Dom.attr("id", "name"),
-              Dom.attr("name", "name"),
-              ),
-            ),
-          Dom.element(
-            "div",
-            Dom.attr("class", "form-group"),
-            Dom.element(
-              "label",
-              Dom.attr("for", "distance"),
-              Dom.text("Distance"),
-              ),
-            Dom.element(
-              "input",
-              Dom.attr("type", "number"),
-              Dom.attr("class", "form-control"),
-              Dom.attr("id", "distance"),
-              Dom.attr("name", "distance"),
-              ),
-            ),
-          Dom.element(
-            "div",
-            Dom.attr("class", "form-group"),
-            Dom.element(
-              "label",
-              Dom.attr("for", "elevation"),
-              Dom.text("Elevation"),
-              ),
-            Dom.element(
-              "input",
-              Dom.attr("type", "number"),
-              Dom.attr("class", "form-control"),
-              Dom.attr("id", "elevation"),
-              Dom.attr("name", "elevation"),
-              ),
-            ),
-          Dom.element(
-            "div",
-            Dom.attr("class", "form-group"),
-            Dom.element(
-              "label",
-              Dom.attr("for", "difficulty"),
-              Dom.text("Difficulty"),
-              ),
-            Dom.element(
-              "input",
-              Dom.attr("type", "text"),
-              Dom.attr("class", "form-control"),
-              Dom.attr("id", "difficulty"),
-              Dom.attr("name", "difficulty"),
-              ),
-            ),
-          Dom.element(
-            "div",
-            Dom.attr("class", "form-group"),
-            Dom.element(
-              "label",
-              Dom.attr("for", "description"),
-              Dom.text("Description"),
-              ),
-            Dom.element(
-              "input",
-              Dom.attr("type", "text"),
-              Dom.attr("class", "form-control"),
-              Dom.attr("id", "description"),
-              Dom.attr("name", "description"),
-              ),
-            ),
-          Dom.element(
-            "div",
-            Dom.element(
-              "button",
-              Dom.attr("type", "submit"),
-              Dom.attr("class", "btn btn-primary"),
-              Dom.text("Add"),
-              Dom.element(
-                "script",
-                Dom.attr("type", "module"),
-                Dom.attr("src", "src/main/scala/view/AlertFromConsole.js"),
+              tr(
+                td(hike.name),
+                td(hike.distance.toString),
+                td(hike.elevation.toString),
+                td(hike.difficulty),
+                td(hike.description),
+                td(
+                  button("Edit", typeAttr := "submit", classAttr := List("btn btn-success")),
+                  button("Delete", classAttr := List("btn btn-danger"), Dom.attr("hx-delete", s"/mvc/hikes/${hike.id}")),
+                )
               )
             )
           )
         )
       )
+
+  def formContent: Html = div(
+    classAttr := List("container p-10 my-10 border border-primary rounded"),
+    styleAttr := Seq(("width", "50%"), ("margin", "0 auto"), ("margin-top", "20px"), ("margin-bottom", "20px"), ("padding", "20px")),
+    h2("Add a new hike", classAttr := List("text-center")),
+    form(
+      classAttr := List("form-horizontal"),
+      Dom.attr("hx-trigger", "submit"),
+      Dom.attr("hx-swap", "outerHTML"),
+      Dom.attr("hx-target", "#table"),
+      Dom.attr("hx-post", "/mvc/hikes"),
+      Dom.attr("hx-ext", "json-enc"),
+      div(
+        label("Id", forAttr := "id"),
+        input(
+          idAttr := "id",
+          nameAttr := "id",
+          typeAttr := "number",
+          classAttr := List("form-control"),
+        ),
+        label("Name", forAttr := "name"),
+        input(
+          idAttr := "name",
+          nameAttr := "name",
+          typeAttr := "text",
+          classAttr := List("form-control"),
+          ),
+        classAttr := List("form-group"),
+      ),
+      div(
+        label("Distance", forAttr := "distance"),
+        input(
+          idAttr := "distance",
+          nameAttr := "distance",
+          typeAttr := "number",
+          classAttr := List("form-control"),
+          ),
+        classAttr := List("form-group"),
+      ),
+      div(
+        label("Elevation", forAttr := "elevation"),
+        input(
+          idAttr := "elevation",
+          nameAttr := "elevation",
+          typeAttr := "number",
+          classAttr := List("form-control"),
+          ),
+        classAttr := List("form-group"),
+      ),
+      div(
+        label("Difficulty", forAttr := "difficulty"),
+        input(
+          idAttr := "difficulty",
+          nameAttr := "difficulty",
+          typeAttr := "text",
+          classAttr := List("form-control"),
+          ),
+        classAttr := List("form-group"),
+      ),
+      div(
+        label("Description", forAttr := "description"),
+        input(
+          idAttr := "description",
+          nameAttr := "description",
+          typeAttr := "text",
+          classAttr := List("form-control"),
+          ),
+        classAttr := List("form-group"),
+      ),
+      classAttr := List("form-horizontal"),
+      div(
+        button(
+          "Add",
+          typeAttr := "submit",
+          classAttr := List("btn btn-primary"),
+          onClickAttr := "document.getElementById(\"FORM\").reset()",
+        ),
+      )
     )
   )
+
+  def hikesTable(hikes: Seq[Hike]): Html = tableContent(hikes)
 }
