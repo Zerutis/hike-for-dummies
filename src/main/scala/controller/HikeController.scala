@@ -36,6 +36,10 @@ object HikeController {
   }
 
   def viewApp: Http[HikeRepo, Throwable, Request, Response] = Http.collectZIO[Request] {
+    case Method.GET -> Root / "mvc" / "hikes" / int(id) =>
+      for {
+        hike <- ZIO.serviceWithZIO[HikeRepo](_.findById(id)).map(_.get)
+      } yield Response.html(View.editForm(hike))
     case Method.GET -> Root / "mvc" / "index" =>
       for {
         hikes <- ZIO.serviceWithZIO[HikeRepo](_.findAll)
@@ -57,7 +61,7 @@ object HikeController {
         hike <- ZIO.fromEither(memberJson.fromJson[Hike]).mapError(msg => BadRequest(msg))
         _ <- ZIO.serviceWithZIO[HikeRepo](_.update(hike))
         hikes <- ZIO.serviceWithZIO[HikeRepo](_.findAll)
-      } yield Response.html(View.hikesTable(hikes))
+      } yield Response.html(View.index(hikes))
     case Method.DELETE -> Root / "mvc" / "hikes" / int(id) =>
       for {
         _ <- ZIO.serviceWithZIO[HikeRepo](_.delete(id))

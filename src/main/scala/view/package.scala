@@ -52,7 +52,12 @@ package object View {
                 td(hike.difficulty),
                 td(hike.description),
                 td(
-                  button("Edit", typeAttr := "submit", classAttr := List("btn btn-success")),
+                  a(
+                    "Edit",
+                    typeAttr := "submit",
+                    classAttr := List("btn btn-success"),
+                    hrefAttr := s"/mvc/hikes/${hike.id}",
+                  ),
                   button("Delete", classAttr := List("btn btn-danger"), Dom.attr("hx-delete", s"/mvc/hikes/${hike.id}")),
                 )
               )
@@ -142,4 +147,89 @@ package object View {
   )
 
   def hikesTable(hikes: Seq[Hike]): Html = tableContent(hikes)
+
+  def editForm(hike: Hike): Html = pageConfig ++
+    div(
+      classAttr := List("container p-10 my-10 border border-primary rounded"),
+      styleAttr := Seq(("width", "50%"), ("margin", "0 auto"), ("margin-top", "20px"), ("margin-bottom", "20px"), ("padding", "20px")),
+      h2("Edit hike", classAttr := List("text-center")),
+      form(
+        classAttr := List("form-horizontal"),
+        Dom.attr("hx-trigger", "submit"),
+        Dom.attr("hx-put", "/mvc/hikes"),
+        Dom.attr("hx-ext", "json-enc"),
+        Dom.attr("hx-swap", "none"),
+        div(
+          label("Id", forAttr := "id"),
+          input(
+            idAttr := "id",
+            valueAttr := hike.id.toString,
+            nameAttr := "id",
+            typeAttr := "number",
+            classAttr := List("form-control"),
+          ),
+        ),
+        div(
+          label("Name", forAttr := "name"),
+          input(
+            idAttr := "name",
+            valueAttr := hike.name,
+            nameAttr := "name",
+            typeAttr := "text",
+            classAttr := List("form-control"),
+          ),
+          classAttr := List("form-group"),
+        ),
+        div(
+          label("Distance", forAttr := "distance"),
+          input(
+            idAttr := "distance",
+            valueAttr := hike.distance.toString,
+            nameAttr := "distance",
+            typeAttr := "number",
+            classAttr := List("form-control"),
+          ),
+          classAttr := List("form-group"),
+        ),
+        div(
+          label("Elevation", forAttr := "elevation"),
+          input(
+            idAttr := "elevation",
+            valueAttr := hike.elevation.toString,
+            nameAttr := "elevation",
+            typeAttr := "number",
+            classAttr := List("form-control"),
+          ),
+          classAttr := List("form-group"),
+        ),
+        div(
+          label("Difficulty", forAttr := "difficulty"),
+          input(
+            idAttr := "difficulty",
+            valueAttr := hike.difficulty,
+            nameAttr := "difficulty",
+            typeAttr := "text",
+            classAttr := List("form-control"),
+          ),
+          classAttr := List("form-group"),
+        ),
+        div(
+          label("Description", forAttr := "description"),
+          input(
+            idAttr := "description",
+            valueAttr := hike.description,
+            nameAttr := "description",
+            typeAttr := "text",
+            classAttr := List("form-control"),
+          ),
+          classAttr := List("form-group"),
+        ),
+        classAttr := List("form-horizontal"),
+        div(
+          styleAttr := Seq(("width", "50%"), ("margin", "0 auto"), ("margin-top", "20px"), ("margin-bottom", "20px"), ("padding", "20px")),
+          button("Save", typeAttr := "submit", classAttr := List("btn btn-primary")),
+          a("Go back", classAttr := List("btn btn-danger"), hrefAttr("/mvc/index")),
+        )
+      )
+    )
 }
