@@ -6,7 +6,8 @@ lazy val root = (project in file("."))
   .settings(
     name := "dummies",
     idePackagePrefix := Some("dummies"),
-)
+    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
+  )
   .settings(dependencies)
 
 lazy val dependencies = Seq(
@@ -23,5 +24,10 @@ lazy val dependencies = Seq(
     "ch.qos.logback" % "logback-classic"   % "1.4.7",
 
     "com.h2database" % "h2" % "2.1.214",
+
+
+    "dev.zio" %% "zio-test" % "2.0.12" % Test,
+    "dev.zio" %% "zio-test-sbt" % "2.0.12" % Test,
+    "dev.zio" %% "zio-test-magnolia" % "2.0.12" % Test
     )
   )

@@ -3,34 +3,33 @@ package repo
 
 import model.Hike
 
-import io.getquill.SnakeCase
-import io.getquill.jdbczio.Quill
-import zio._
+import zio.{Task, ZIO}
 
-case class HikeRepo(quill: Quill.Postgres[SnakeCase]) {
-  import quill._
+trait HikeRepo {
+  def findAll: Task[List[Hike]]
 
-  private val hikes = quote(query[Hike])
+  def findById(id: Int): Task[Option[Hike]]
 
-  def findAll: Task[List[Hike]] =
-    run(hikes)
+  def insert(hike: Hike): Task[Long]
 
-  def findById(id: Int): Task[Option[Hike]] =
-    run(hikes.filter(_.id == lift(id))).map(_.headOption)
+  def update(hike: Hike): Task[Long]
 
-  def insert(hike: Hike): Task[Long] =
-    run(hikes.insertValue(lift(hike)))
-
-  def update(hike: Hike): Task[Long] = run(
-    hikes
-      .filter(hikeDomain => hikeDomain.id == lift(hike.id))
-      .updateValue(lift(hike))
-    )
-
-  def delete(id: Int): Task[Long] =
-    run(hikes.filter(_.id == lift(id)).delete)
+  def delete(id: Int): Task[Long]
 }
 
 object HikeRepo {
-  val layer: ZLayer[Quill.Postgres[SnakeCase], Nothing, HikeRepo] = ZLayer.fromFunction(HikeRepo(_))
+  def findAll: ZIO[HikeRepo, Throwable, List[Hike]] =
+    ZIO.serviceWithZIO[HikeRepo](_.findAll)
+
+  def findById(id: Int): ZIO[HikeRepo, Throwable, Option[Hike]] =
+    ZIO.serviceWithZIO[HikeRepo](_.findById(id))
+
+  def insert(hike: Hike): ZIO[HikeRepo, Throwable, Long] =
+    ZIO.serviceWithZIO[HikeRepo](_.insert(hike))
+
+  def update(hike: Hike): ZIO[HikeRepo, Throwable, Long] =
+    ZIO.serviceWithZIO[HikeRepo](_.update(hike))
+
+  def delete(id: Int): ZIO[HikeRepo, Throwable, Long] =
+    ZIO.serviceWithZIO[HikeRepo](_.delete(id))
 }
