@@ -15,7 +15,12 @@ object HikeController {
     case Method.GET -> Root / "hikes" =>
       HikeRepo.findAll.map(hikes => Response.json(hikes.toJson))
     case Method.GET -> Root / "hikes" / int(id) =>
-      HikeRepo.findById(id).map(hike => Response.json(hike.toJson))
+      for {
+        maybeHike <- HikeRepo.findById(id)
+      } yield maybeHike match {
+        case Some(hike) => Response.json(hike.toJson)
+        case None => Response.status(Status.NotFound)
+      }
     case request @ Method.POST -> Root / "hikes" =>
       for {
         memberJson <- request.body.asString

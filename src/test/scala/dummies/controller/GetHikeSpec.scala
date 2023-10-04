@@ -1,37 +1,39 @@
 package dummies
 package controller
 
-
 import model.Hike
+import model.Hike._
 import repo.{HikeRepo, InMemoryHikeRepo}
 
 import zio.Scope
 import zio.json._
-import zio.http.{URL, _}
+import zio.http._
 import zio.test._
+import zio.test.Assertion.equalTo
 import zio.test.ZIOSpecDefault
 
 object GetHikeSpec extends ZIOSpecDefault {
 
   val app: Http[HikeRepo, Throwable, Request, Response] = HikeController.app
 
+  val hikeId = 1
+  val request = Request.get(URL(Root / "hikes" / hikeId.toString))
+
   override def spec: Spec[TestEnvironment with Scope, Any] =
     suite("Get hike")(
-      test("Should return hike when one exists") {
-        val expectedHike = Hike(1, "Hike 1", 10.5, 15, "Easy", "Hike 1 description")
+      test("Should return response with hike") {
+        val hike = Hike(hikeId, "Hike 1", 10.5, 15, "Easy", "Hike 1 description")
 
         for {
-          _ <- HikeRepo.insert(expectedHike)
-          response <- app.runZIO(Request.get(url = URL(Root / "hikes" / expectedHike.id.toString)))
-          actualHike <- response.body.asString.map(_.fromJson[Hike].toOption)
-        } yield assertTrue(Option(expectedHike) == actualHike)
+          _ <- HikeRepo.insert(hike)
+          response <- app.runZIO(request)
+        } yield assertTrue(response == Response.json(hike.toJson))
       },
 
-      test("Should return not found exception when no hike exists") {
+      test("Should return not found when hike not found") {
         for {
-          response <- app.runZIO(Request.get(url = URL(Root / "hikes" / "1")))
-          actualHike <- response.body.asString.map(_.fromJson[Hike].toOption)
-        } yield assertTrue(actualHike.isEmpty)
-      }
+          response <- app.runZIO(request)
+        } yield assertTrue(response.status == Status.NotFound)
+      },
     ).provide(InMemoryHikeRepo.layer)
 }

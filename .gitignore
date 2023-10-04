@@ -4,6 +4,12 @@
 target/
 project/project
 project/target
-logs/
-.bsp/
-.idea/
+project/.bloop
+project/metals.sbt
+logs
+.bsp
+.idea
+.bloop
+.vscode
+.metals
+
