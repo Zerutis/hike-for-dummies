@@ -4,8 +4,7 @@ import model.Hike
 
 import zio.http.html._
 
-package object View {
-
+object HikeView {
   private val pageConfig: Html = html(
     langAttr := "en",
     head(
