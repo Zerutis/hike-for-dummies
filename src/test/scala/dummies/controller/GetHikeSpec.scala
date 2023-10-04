@@ -17,12 +17,21 @@ object GetHikeSpec extends ZIOSpecDefault {
 
   override def spec: Spec[TestEnvironment with Scope, Any] =
     suite("Get hike")(
-      test("Should return something") {
+      test("Should return hike when one exists") {
+        val expectedHike = Hike(1, "Hike 1", 10.5, 15, "Easy", "Hike 1 description")
+
         for {
-          _ <- HikeRepo.insert(Hike(2, "Hike 1", 10.5, 15, "Easy", "Hike 1 description"))
+          _ <- HikeRepo.insert(expectedHike)
+          response <- app.runZIO(Request.get(url = URL(Root / "hikes" / expectedHike.id.toString)))
+          actualHike <- response.body.asString.map(_.fromJson[Hike].toOption)
+        } yield assertTrue(Option(expectedHike) == actualHike)
+      },
+
+      test("Should return not found exception when no hike exists") {
+        for {
           response <- app.runZIO(Request.get(url = URL(Root / "hikes" / "1")))
-          hike <- response.body.asString.map(_.fromJson[Hike].toOption)
-        } yield assertTrue(hike.get.id == 1)
+          actualHike <- response.body.asString.map(_.fromJson[Hike].toOption)
+        } yield assertTrue(actualHike.isEmpty)
       }
     ).provide(InMemoryHikeRepo.layer)
 }
