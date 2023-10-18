@@ -1,12 +1,13 @@
 package dummies
 
+import clients.HikeClient
+import controller.HikeController
+import repo.PersistentHikeRepo
+
 import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
 import zio._
 import zio.http._
-import controller.HikeController
-import repo.PersistentHikeRepo
-
 import zio.http.Header.{AccessControlAllowOrigin, Origin}
 import zio.http.HttpAppMiddleware.cors
 import zio.http.internal.middlewares.Cors.CorsConfig
@@ -27,9 +28,9 @@ object Main extends ZIOAppDefault {
   lazy val dataSourceLayer = Quill.DataSource.fromPrefix("ctx")
 
   lazy val databaseLayer = dataSourceLayer >>> postgresLayer
-  lazy val hikeLayer =  databaseLayer >>>  PersistentHikeRepo.layer
+  lazy val hikeLayer =  databaseLayer >>>  PersistentHikeRepo.layer ++ HikeClient.clientLayer
 
-  lazy val apps = HikeController.app @@ cors(corsConfig)
+  lazy val apps = HikeController.app ++ HikeController.grpcApp
   lazy val httpApps = apps
     .provideLayer(hikeLayer)
     .mapError(e => Response.text(e.getMessage))

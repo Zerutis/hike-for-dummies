@@ -1,10 +1,13 @@
 package dummies
 package controller
 
+import clients.HikeClient
 import model.Hike
 import model.Hike._
 import repo.HikeRepo
 
+import io.grpc.StatusException
+import protos.hikes.ZioHikes.HikeServiceClient
 import zio._
 import zio.http.HttpError._
 import zio.http._
@@ -35,5 +38,10 @@ object HikeController {
       } yield Response.json(hike.toJson)
     case Method.DELETE -> Root / "hikes" / int(id) =>
       HikeRepo.delete(id).map(id => Response.text(s"Hike deleted with id: $id"))
+  }
+
+  def grpcApp: Http[HikeServiceClient, StatusException, Request, Response] = Http.collectZIO[Request] {
+    case Method.GET -> Root / "grpc" / "hikes" =>
+      HikeClient.getHike.map(hike => Response.json(hike.toJson))
   }
 }

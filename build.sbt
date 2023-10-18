@@ -10,6 +10,11 @@ lazy val root = (project in file("."))
   )
   .settings(dependencies)
 
+Compile / PB.targets  := Seq(
+    scalapb.gen(grpc = true) -> (Compile / sourceManaged).value,
+    scalapb.zio_grpc.ZioCodeGenerator -> (Compile / sourceManaged).value,
+)
+
 lazy val dependencies = Seq(
   libraryDependencies ++= Seq(
     "dev.zio" %% "zio" % "2.0.12",
@@ -25,9 +30,13 @@ lazy val dependencies = Seq(
 
     "com.h2database" % "h2" % "2.1.214",
 
+    "io.grpc" % "grpc-netty" % "1.51.0",
+    "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
 
     "dev.zio" %% "zio-test" % "2.0.12" % Test,
     "dev.zio" %% "zio-test-sbt" % "2.0.12" % Test,
     "dev.zio" %% "zio-test-magnolia" % "2.0.12" % Test
     )
   )
+
+run / fork := true

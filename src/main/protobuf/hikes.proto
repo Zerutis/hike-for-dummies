@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package dummies.protos;
+
+service HikeService {
+    rpc GetHike(GetHikeRequest) returns (GetHikeResponse) {}
+}
+
+message GetHikeRequest {
+    string id = 1;
+}
+
+message GetHikeResponse {
+    Hike hike = 1;
+}
+
+message Hike {
+    string id = 1;
+}
