@@ -30,7 +30,7 @@ object Main extends ZIOAppDefault {
   lazy val databaseLayer = dataSourceLayer >>> postgresLayer
   lazy val hikeLayer =  databaseLayer >>>  PersistentHikeRepo.layer ++ HikeClient.clientLayer
 
-  lazy val apps = HikeController.app ++ HikeController.grpcApp
+  lazy val apps = (HikeController.app ++ HikeController.grpcApp) @@ cors(corsConfig)
   lazy val httpApps = apps
     .provideLayer(hikeLayer)
     .mapError(e => Response.text(e.getMessage).withStatus(Status.InternalServerError))
