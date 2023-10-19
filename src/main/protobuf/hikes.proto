@@ -4,16 +4,57 @@ package dummies.protos;
 
 service HikeService {
     rpc GetHike(GetHikeRequest) returns (GetHikeResponse) {}
+
+    rpc GetHikes(GetHikesRequest) returns (GetHikesResponse) {}
+
+    rpc CreateHike(CreateHikeRequest) returns (CreateHikeResponse) {}
+
+    rpc UpdateHike(UpdateHikeRequest) returns (UpdateHikeResponse) {}
+
+    rpc DeleteHike(DeleteHikeRequest) returns (DeleteHikeResponse) {}
 }
 
 message GetHikeRequest {
-    string id = 1;
+    int32 id = 1;
 }
 
 message GetHikeResponse {
     Hike hike = 1;
 }
 
+message GetHikesRequest {}
+
+message GetHikesResponse {
+    repeated Hike hikes = 1;
+}
+
+message CreateHikeRequest {
+    Hike hike = 1;
+}
+
+message CreateHikeResponse {
+    int32 id = 1;
+}
+
+message UpdateHikeRequest {
+    Hike hike = 1;
+}
+
+message UpdateHikeResponse {
+    int32 id = 1;
+}
+
+message DeleteHikeRequest {
+    int32 id = 1;
+}
+
+message DeleteHikeResponse {}
+
 message Hike {
-    string id = 1;
+    int32 id = 1;
+    string name = 2;
+    double distance = 3;
+    int32 elevation = 4;
+    string difficulty = 5;
+    string description = 6;
 }

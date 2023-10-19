@@ -33,7 +33,7 @@ object Main extends ZIOAppDefault {
   lazy val apps = HikeController.app ++ HikeController.grpcApp
   lazy val httpApps = apps
     .provideLayer(hikeLayer)
-    .mapError(e => Response.text(e.getMessage))
+    .mapError(e => Response.text(e.getMessage).withStatus(Status.InternalServerError))
 
   override def run = for {
     _ <- Console.printLine(s"Starting server at http://localhost:8080")

@@ -1,8 +1,8 @@
 package dummies
 package mvc
 
-import model.Hike
-import model.Hike._
+import model.HikeDomain
+import model.HikeDomain._
 import repo.HikeRepo
 
 import zio._
@@ -27,14 +27,14 @@ class HikeControllerAsMVC {
     case request @ Method.POST -> Root / "mvc" / "hikes" =>
       for {
         memberJson <- request.body.asString
-        hike <- ZIO.fromEither(memberJson.fromJson[Hike]).mapError(msg => BadRequest(msg))
+        hike <- ZIO.fromEither(memberJson.fromJson[HikeDomain]).mapError(msg => BadRequest(msg))
         _ <- ZIO.serviceWithZIO[HikeRepo](_.insert(hike))
         hikes <- ZIO.serviceWithZIO[HikeRepo](_.findAll)
       } yield Response.html(HikeView.hikesTable(hikes))
     case request @ Method.PUT -> Root / "mvc" / "hikes" =>
       for {
         memberJson <- request.body.asString
-        hike <- ZIO.fromEither(memberJson.fromJson[Hike]).mapError(msg => BadRequest(msg))
+        hike <- ZIO.fromEither(memberJson.fromJson[HikeDomain]).mapError(msg => BadRequest(msg))
         _ <- ZIO.serviceWithZIO[HikeRepo](_.update(hike))
         hikes <- ZIO.serviceWithZIO[HikeRepo](_.findAll)
       } yield Response.html(HikeView.index(hikes))

@@ -1,33 +1,33 @@
 package dummies
 package repo
 
-import model.Hike
+import model.HikeDomain
 
 import zio.{Task, ZIO}
 
 trait HikeRepo {
-  def findAll: Task[List[Hike]]
+  def findAll: Task[List[HikeDomain]]
 
-  def findById(id: Int): Task[Option[Hike]]
+  def findById(id: Int): Task[Option[HikeDomain]]
 
-  def insert(hike: Hike): Task[Long]
+  def insert(hike: HikeDomain): Task[Long]
 
-  def update(hike: Hike): Task[Long]
+  def update(hike: HikeDomain): Task[Long]
 
   def delete(id: Int): Task[Long]
 }
 
 object HikeRepo {
-  def findAll: ZIO[HikeRepo, Throwable, List[Hike]] =
+  def findAll: ZIO[HikeRepo, Throwable, List[HikeDomain]] =
     ZIO.serviceWithZIO[HikeRepo](_.findAll)
 
-  def findById(id: Int): ZIO[HikeRepo, Throwable, Option[Hike]] =
+  def findById(id: Int): ZIO[HikeRepo, Throwable, Option[HikeDomain]] =
     ZIO.serviceWithZIO[HikeRepo](_.findById(id))
 
-  def insert(hike: Hike): ZIO[HikeRepo, Throwable, Long] =
+  def insert(hike: HikeDomain): ZIO[HikeRepo, Throwable, Long] =
     ZIO.serviceWithZIO[HikeRepo](_.insert(hike))
 
-  def update(hike: Hike): ZIO[HikeRepo, Throwable, Long] =
+  def update(hike: HikeDomain): ZIO[HikeRepo, Throwable, Long] =
     ZIO.serviceWithZIO[HikeRepo](_.update(hike))
 
   def delete(id: Int): ZIO[HikeRepo, Throwable, Long] =

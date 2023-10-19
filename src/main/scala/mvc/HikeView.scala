@@ -1,6 +1,6 @@
 package dummies
 
-import model.Hike
+import model.HikeDomain
 
 import zio.http.html._
 
@@ -27,11 +27,11 @@ object HikeView {
   private val titleContent = body(h1("Hikes for dummies using MVC", classAttr := List("text-center")))
 
 
-  def index(hikes: Seq[Hike]): Html = {
+  def index(hikes: Seq[HikeDomain]): Html = {
     pageConfig ++ titleContent ++ tableContent(hikes) ++ formContent
   }
 
-  private def tableContent(hikes: Seq[Hike]): Html =
+  private def tableContent(hikes: Seq[HikeDomain]): Html =
     div(
       idAttr := "table",
       table(
@@ -145,9 +145,9 @@ object HikeView {
     )
   )
 
-  def hikesTable(hikes: Seq[Hike]): Html = tableContent(hikes)
+  def hikesTable(hikes: Seq[HikeDomain]): Html = tableContent(hikes)
 
-  def editForm(hike: Hike): Html = pageConfig ++
+  def editForm(hike: HikeDomain): Html = pageConfig ++
     div(
       classAttr := List("container p-10 my-10 border border-primary rounded"),
       styleAttr := Seq(("width", "50%"), ("margin", "0 auto"), ("margin-top", "20px"), ("margin-bottom", "20px"), ("padding", "20px")),
